@@ -13,8 +13,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 st.set_page_config(
-    page_title="IT Spend Analyzer",
-    page_icon="💼",
+    page_title="FinOps AI — IT Spend Intelligence",
+    page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -174,8 +174,8 @@ def _make_chart(agent_name: str, data: pd.DataFrame):
 
 # ─── Sidebar ──────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 💼 IT Spend Analyzer")
-    st.caption("Multi-Agent TBM Analysis Platform")
+    st.markdown("## 🤖 FinOps AI")
+    st.caption("Multi-Agent IT Spend Intelligence")
     st.markdown("---")
 
     # File upload
@@ -237,7 +237,7 @@ with st.sidebar:
 
 
 # ─── Main Chat Area ───────────────────────────────────────────────────────────
-st.markdown("## Enterprise IT Spend Analyzer")
+st.markdown("## FinOps AI — IT Spend Intelligence")
 
 if st.session_state.df is None:
     st.info("Upload your IT spend CSV or click **Load Sample Data** in the sidebar to get started.")
