@@ -1,5 +1,7 @@
 # Enterprise IT Spend Analyzer
 
+🚀 **Live Demo:** [https://finops-ai.streamlit.app](https://finops-ai.streamlit.app)
+
 A multi-agent AI system for enterprise IT spend analysis built on the **Technology Business Management (TBM)** framework. Upload any IT spend CSV and ask questions in plain English — a team of specialist AI agents analyzes your data, identifies waste, and generates executive-ready recommendations.
 
 ---
