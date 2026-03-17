@@ -72,6 +72,7 @@ def init_session_state():
         "chat_history": [],
         "api_key": os.environ.get("ANTHROPIC_API_KEY", ""),
         "analysis_run": False,
+        "pending_prompt": None,
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -114,26 +115,15 @@ def _load_sample_data() -> pd.DataFrame:
     return pd.read_csv(sample_path)
 
 
-def _run_agent(agent_name: str, question: str):
-    """Run an agent and store the results in session state."""
-    if not st.session_state.api_key:
-        st.error("Please enter your Anthropic API key in the sidebar.")
-        return
-    if st.session_state.df is None:
-        st.error("Please upload data first.")
-        return
-
+def _call_agent_api(agent_name: str, question: str) -> bool:
+    """Execute agent API call, store results. No st.rerun()."""
     from src.orchestrator import Orchestrator
     from src.models.schemas import SpendContext
 
-    # "auto" means let the orchestrator decide — just pass the question through
-    if agent_name == "auto":
-        question_for_context = question
-    elif agent_name == "full":
-        question_for_context = "run a comprehensive full analysis of all IT spend data"
-    else:
-        question_for_context = question
-
+    question_for_context = (
+        "run a comprehensive full analysis of all IT spend data"
+        if agent_name == "full" else question
+    )
     context = SpendContext(
         df=st.session_state.df,
         analytics=st.session_state.analytics,
@@ -142,29 +132,33 @@ def _run_agent(agent_name: str, question: str):
         conversation_history=st.session_state.chat_history,
         user_question=question_for_context,
     )
+    try:
+        orchestrator = Orchestrator(api_key=st.session_state.api_key)
+        results = orchestrator.route_and_run(context)
+        st.session_state.agent_results.update(results)
+        for name, resp in results.items():
+            if resp.success:
+                st.session_state.chat_history.append({
+                    "role": "assistant",
+                    "content": resp.summary,
+                    "agent": name,
+                })
+        return True
+    except Exception as e:
+        st.error(f"Analysis error: {e}")
+        return False
 
-    success = False
-    label = "AI Analyst" if agent_name == "auto" else agent_name.replace("_", " ").title()
-    placeholder = st.empty()
 
-    with placeholder.container():
-        with st.spinner(f"Analyzing... ({label})"):
-            try:
-                orchestrator = Orchestrator(api_key=st.session_state.api_key)
-                results = orchestrator.route_and_run(context)
-                st.session_state.agent_results.update(results)
-                st.session_state.chat_history.append({"role": "user", "content": question})
-                for name, resp in results.items():
-                    if resp.success:
-                        st.session_state.chat_history.append({
-                            "role": "assistant",
-                            "content": resp.summary,
-                            "agent": name,
-                        })
-                success = True
-            except Exception as e:
-                st.error(f"Analysis error: {e}")
-
+def _run_agent(agent_name: str, question: str):
+    """Run an agent from a button click — shows status, then reruns."""
+    if not st.session_state.api_key:
+        st.error("ANTHROPIC_API_KEY not set. Add it to your .env file.")
+        return
+    if st.session_state.df is None:
+        st.error("Please load data first.")
+        return
+    with st.status("Running AI analysis — this takes 15–30 seconds...", expanded=True):
+        success = _call_agent_api(agent_name, question)
     if success:
         st.rerun()
 
@@ -532,7 +526,7 @@ else:
         st.subheader("Ask the AI Analyst")
         st.caption("Ask questions about your IT spend data. The system routes your question to the most relevant specialist agent.")
 
-        # Chat history
+        # Render full chat history
         for msg in st.session_state.chat_history:
             if msg["role"] == "user":
                 with st.chat_message("user"):
@@ -553,9 +547,17 @@ else:
                     )
                     st.markdown(msg["content"])
 
-        # Chat input — must be last element in tab
+        # Process pending prompt (stored from previous rerun)
+        if st.session_state.get("pending_prompt"):
+            prompt = st.session_state.pending_prompt
+            st.session_state.pending_prompt = None
+            with st.chat_message("assistant"):
+                with st.spinner("Analyzing your IT spend data..."):
+                    _call_agent_api("auto", prompt)
+            st.rerun()
+
+        # Chat input — must be the very last element
         if prompt := st.chat_input("Ask a question about your IT spend..."):
-            # Show user message immediately
-            with st.chat_message("user"):
-                st.write(prompt)
-            _run_agent("auto", prompt)
+            st.session_state.chat_history.append({"role": "user", "content": prompt})
+            st.session_state.pending_prompt = prompt
+            st.rerun()
