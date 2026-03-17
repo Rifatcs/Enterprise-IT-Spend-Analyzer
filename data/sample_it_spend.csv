@@ -1,0 +1,51 @@
+vendor,service_name,department,business_unit,cost_category,spend_type,monthly_cost,annual_cost,contract_type,contract_start_date,contract_end_date,utilization_pct,region,headcount_supported,notes
+Amazon Web Services,EC2 Compute,Engineering,Product,Cloud,OPEX,45000,540000,Pay-as-you-go,2021-01-01,2025-12-31,78,US-East,250,Primary production compute cluster
+Amazon Web Services,S3 Object Storage,Engineering,Product,Cloud,OPEX,12000,144000,Pay-as-you-go,2021-01-01,2025-12-31,65,US-East,250,Object storage and backups
+Amazon Web Services,RDS Database,Engineering,Product,Cloud,OPEX,8500,102000,Reserved,2022-01-01,2025-12-31,82,US-East,200,Production managed databases
+Microsoft Azure,Azure Virtual Machines,IT Operations,IT,Cloud,OPEX,22000,264000,Enterprise,2020-06-01,2024-05-31,42,US-West,500,Dev/test environments - significantly underutilized
+Microsoft Azure,Azure Active Directory,IT Operations,IT,SaaS,OPEX,3500,42000,Enterprise,2020-06-01,2025-05-31,100,Global,2500,Identity and access management
+Microsoft 365,Office 365 E3,HR,Corporate,SaaS,OPEX,28750,345000,Enterprise,2019-01-01,2025-12-31,92,Global,2300,Enterprise collaboration suite
+Salesforce,Sales Cloud Enterprise,Sales,Commercial,SaaS,OPEX,35000,420000,Enterprise,2018-03-01,2025-02-28,88,Global,350,Primary CRM platform
+Salesforce,Marketing Cloud,Marketing,Commercial,SaaS,OPEX,18000,216000,Enterprise,2020-01-01,2024-06-30,48,Global,45,Marketing automation - renewal approaching
+ServiceNow,ITSM Platform,IT Operations,IT,SaaS,OPEX,22000,264000,Enterprise,2021-07-01,2025-06-30,91,Global,2500,IT service management platform
+Workday,HCM Suite,HR,Corporate,SaaS,OPEX,31250,375000,Enterprise,2019-06-01,2025-05-31,95,Global,2500,Core HR and payroll system
+Oracle,Database Enterprise Edition,Finance,Corporate,Software License,CAPEX,15000,180000,Perpetual+Support,2015-01-01,2024-12-31,68,US,150,Legacy financial database - migration candidate
+SAP,ERP S/4HANA,Finance,Corporate,SaaS,OPEX,55000,660000,Enterprise,2021-01-01,2026-12-31,85,Global,800,Core ERP platform
+Zoom,Video Communications,All,Corporate,SaaS,OPEX,12500,150000,Enterprise,2020-03-01,2025-02-28,78,Global,2500,Enterprise video conferencing
+Slack,Team Collaboration,Engineering,Product,SaaS,OPEX,8750,105000,Enterprise,2019-09-01,2025-08-31,82,Global,1200,Engineering team messaging
+GitHub,Source Code Management,Engineering,Product,SaaS,OPEX,4500,54000,Enterprise,2018-01-01,2025-12-31,95,Global,350,Version control and CI/CD
+Atlassian,Jira and Confluence,Engineering,Product,SaaS,OPEX,6000,72000,Enterprise,2017-01-01,2024-12-31,88,Global,800,Project management and documentation
+Datadog,Infrastructure Monitoring,Engineering,Product,SaaS,OPEX,15000,180000,Enterprise,2022-01-01,2025-12-31,72,Global,350,Full-stack monitoring and APM
+Splunk,SIEM and Log Management,IT Security,IT,SaaS,OPEX,28000,336000,Enterprise,2020-01-01,2024-09-30,58,US,50,Security analytics platform - renewal upcoming
+Palo Alto Networks,NGFW and Security,IT Security,IT,Infrastructure,CAPEX,8333,100000,Perpetual+Support,2021-06-01,2025-05-31,90,Global,2500,Next-gen firewall infrastructure
+Cisco Systems,Core Network Infrastructure,IT Operations,IT,Infrastructure,CAPEX,12500,150000,Perpetual+Support,2019-01-01,2025-12-31,75,US,2500,Campus and data center networking
+Dell Technologies,On-Premise Server Farm,IT Operations,IT,Infrastructure,CAPEX,16667,200000,Perpetual,2020-01-01,2025-12-31,52,US,2500,Aging data center servers - underutilized
+NetApp,Enterprise Storage Arrays,IT Operations,IT,Infrastructure,CAPEX,10000,120000,Perpetual+Support,2020-06-01,2026-05-31,48,US,2500,Primary storage - significantly underutilized
+Google Cloud,BigQuery Analytics Platform,Data & Analytics,Product,Cloud,OPEX,18000,216000,Pay-as-you-go,2022-01-01,2025-12-31,82,US-Central,100,Data warehouse and analytics
+Google Workspace,Business Suite,Marketing,Commercial,SaaS,OPEX,3250,39000,Enterprise,2018-01-01,2025-12-31,70,Global,650,Duplicate collaboration suite - overlaps with M365
+Tableau,BI and Analytics,Data & Analytics,Product,SaaS,OPEX,12000,144000,Enterprise,2019-01-01,2025-12-31,65,Global,250,Business intelligence and visualization
+Microsoft Power BI,Business Intelligence,Finance,Corporate,SaaS,OPEX,2500,30000,Enterprise,2020-01-01,2025-12-31,55,Global,400,Duplicate BI tool alongside Tableau
+Snowflake,Cloud Data Warehouse,Data & Analytics,Product,Cloud,OPEX,25000,300000,On-Demand,2021-06-01,2025-05-31,77,US,100,Enterprise data warehouse platform
+Okta,Identity Provider,IT Security,IT,SaaS,OPEX,7500,90000,Enterprise,2022-01-01,2025-12-31,98,Global,2500,Primary identity management - high value
+CrowdStrike,Endpoint Detection and Response,IT Security,IT,SaaS,OPEX,9500,114000,Enterprise,2022-06-01,2025-05-31,95,Global,2500,EDR and endpoint protection platform
+Zscaler,Zero Trust Network Access,IT Security,IT,SaaS,OPEX,11000,132000,Enterprise,2023-01-01,2025-12-31,88,Global,2500,Cloud-native ZTNA solution
+DocuSign,E-Signature Platform,Legal,Corporate,SaaS,OPEX,2000,24000,Business,2020-01-01,2024-10-31,38,Global,200,E-signature - low utilization and renewal upcoming
+Box,Cloud Content Management,Legal,Corporate,SaaS,OPEX,3500,42000,Enterprise,2018-01-01,2025-12-31,35,Global,500,Cloud storage - underutilized and overlaps with SharePoint
+Zendesk,Customer Support Platform,Customer Success,Commercial,SaaS,OPEX,8000,96000,Enterprise,2019-06-01,2025-05-31,82,Global,150,Customer service ticketing system
+HubSpot,Marketing Automation,Marketing,Commercial,SaaS,OPEX,4500,54000,Professional,2021-01-01,2024-12-31,32,Global,25,Duplicate with Salesforce Marketing Cloud - very low utilization
+Twilio,Communications API Platform,Engineering,Product,Cloud,OPEX,5500,66000,Pay-as-you-go,2020-01-01,2025-12-31,68,Global,100,CPaaS and SMS platform
+Veeva Systems,Life Sciences CRM,Sales,Commercial,SaaS,OPEX,42000,504000,Enterprise,2016-01-01,2025-12-31,90,US,420,Regulated CRM for field sales - high utilization
+Proofpoint,Email Security Gateway,IT Security,IT,SaaS,OPEX,5500,66000,Enterprise,2020-01-01,2025-12-31,100,Global,2500,Email filtering and threat protection
+Qualys,Vulnerability Management,IT Security,IT,SaaS,OPEX,4000,48000,Enterprise,2021-01-01,2025-12-31,75,Global,2500,Vulnerability scanning and compliance
+Duo Security,Multi-Factor Authentication,IT Security,IT,SaaS,OPEX,3750,45000,Enterprise,2021-01-01,2024-12-31,72,Global,2500,MFA platform - potentially redundant with Okta MFA
+New Relic,APM Platform,Engineering,Product,SaaS,OPEX,9000,108000,Enterprise,2020-01-01,2024-11-30,45,Global,300,APM tool - low utilization and overlaps with Datadog
+Elastic,Search and Observability,Engineering,Product,SaaS,OPEX,7500,90000,Enterprise,2021-01-01,2025-12-31,72,Global,200,Elastic SIEM and full-text search
+Akamai,CDN and Edge Security,Engineering,Product,Infrastructure,OPEX,6000,72000,Enterprise,2019-01-01,2025-12-31,80,Global,2500,Content delivery network
+AT&T,MPLS and WAN,IT Operations,IT,Telecom,OPEX,18000,216000,Enterprise,2020-01-01,2026-12-31,85,US,2500,Enterprise WAN connectivity
+Comcast Business,Broadband Internet Backup,IT Operations,IT,Telecom,OPEX,3500,42000,Enterprise,2021-01-01,2025-12-31,90,US,2500,Backup internet connectivity
+IBM,Mainframe Licensing and Support,Finance,Corporate,Infrastructure,CAPEX,25000,300000,Perpetual+Support,2010-01-01,2024-12-31,62,US,50,Legacy mainframe - strategic migration candidate
+Accenture,IT Managed Services,IT Operations,IT,Professional Services,OPEX,45000,540000,MSA,2021-01-01,2025-12-31,100,US,2500,Infrastructure operations outsourcing
+Tata Consultancy Services,Application Development Support,Engineering,Product,Professional Services,OPEX,38000,456000,MSA,2020-06-01,2025-05-31,95,Global,300,Application maintenance and development
+Mimecast,Email Archiving and Continuity,IT Security,IT,SaaS,OPEX,2800,33600,Enterprise,2019-01-01,2024-06-30,65,Global,2500,Email continuity - renewal due soon
+PagerDuty,Incident Management,Engineering,Product,SaaS,OPEX,3200,38400,Enterprise,2021-01-01,2025-12-31,88,Global,350,On-call and incident management
+Domo,Business Analytics Dashboard,Finance,Corporate,SaaS,OPEX,5500,66000,Enterprise,2020-01-01,2024-08-31,28,Global,150,Executive dashboards - very low utilization and renewal approaching
