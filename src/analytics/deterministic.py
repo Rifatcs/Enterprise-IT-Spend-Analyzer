@@ -15,9 +15,96 @@ warnings.filterwarnings("ignore")
 
 # ─── Data Validation ──────────────────────────────────────────────────────────
 
+def _auto_map_columns(df: pd.DataFrame, quality_report: dict) -> pd.DataFrame:
+    """
+    Intelligently map arbitrary column names to the expected schema.
+    Handles CSVs from various sources (ServiceNow exports, custom spreadsheets, etc.)
+    """
+    cols = list(df.columns)
+    mapped = {}
+
+    def find_col(candidates, existing_name=None):
+        """Find the first column matching any candidate pattern."""
+        if existing_name and existing_name in cols:
+            return existing_name
+        for pattern in candidates:
+            for col in cols:
+                if pattern in col:
+                    return col
+        return None
+
+    # vendor → vendor, supplier, provider, company, tool, application
+    vendor_col = find_col(["vendor", "supplier", "provider", "company", "application", "tool", "product"], "vendor")
+    if vendor_col and vendor_col != "vendor":
+        mapped[vendor_col] = "vendor"
+        quality_report["warnings"].append(f"Mapped '{vendor_col}' → 'vendor'")
+
+    # service_name → service, name, item, description
+    svc_col = find_col(["service_name", "service", "item_name", "item", "description", "name"], "service_name")
+    if svc_col and svc_col != "service_name":
+        mapped[svc_col] = "service_name"
+        quality_report["warnings"].append(f"Mapped '{svc_col}' → 'service_name'")
+
+    # department → department, dept, team, owner, group, business_area
+    dept_col = find_col(["department", "dept", "team", "owner", "group", "business_area", "division"], "department")
+    if dept_col and dept_col != "department":
+        mapped[dept_col] = "department"
+        quality_report["warnings"].append(f"Mapped '{dept_col}' → 'department'")
+
+    # cost_category → category, type, cost_type, spend_category, class
+    cat_col = find_col(["cost_category", "category", "cost_type", "spend_category", "spend_type_detail", "class"], "cost_category")
+    if cat_col and cat_col != "cost_category":
+        mapped[cat_col] = "cost_category"
+        quality_report["warnings"].append(f"Mapped '{cat_col}' → 'cost_category'")
+
+    # annual_cost → annual_cost, annual_spend, yearly_cost, total_cost, amount, spend, cost, price
+    cost_col = find_col(["annual_cost", "annual_spend", "yearly_cost", "total_annual", "total_cost",
+                          "amount", "annual_amount", "cost", "spend", "price", "budget"], "annual_cost")
+    if cost_col and cost_col != "annual_cost":
+        mapped[cost_col] = "annual_cost"
+        quality_report["warnings"].append(f"Mapped '{cost_col}' → 'annual_cost'")
+
+    # monthly_cost
+    mo_col = find_col(["monthly_cost", "monthly_spend", "monthly_amount", "mo_cost"], "monthly_cost")
+    if mo_col and mo_col != "monthly_cost":
+        mapped[mo_col] = "monthly_cost"
+
+    # utilization_pct → utilization, util, usage, utilisation
+    util_col = find_col(["utilization_pct", "utilization", "utilisation", "util_pct", "usage_pct", "usage"], "utilization_pct")
+    if util_col and util_col != "utilization_pct":
+        mapped[util_col] = "utilization_pct"
+        quality_report["warnings"].append(f"Mapped '{util_col}' → 'utilization_pct'")
+
+    # contract_end_date → end_date, expiry, expiration, renewal_date
+    end_col = find_col(["contract_end_date", "end_date", "expiry_date", "expiration_date", "renewal_date", "expires"], "contract_end_date")
+    if end_col and end_col != "contract_end_date":
+        mapped[end_col] = "contract_end_date"
+
+    # contract_start_date
+    start_col = find_col(["contract_start_date", "start_date", "inception_date", "effective_date"], "contract_start_date")
+    if start_col and start_col != "contract_start_date":
+        mapped[start_col] = "contract_start_date"
+
+    # headcount_supported → headcount, users, seats, licenses, employees
+    hc_col = find_col(["headcount_supported", "headcount", "users", "seats", "licenses", "employees", "user_count"], "headcount_supported")
+    if hc_col and hc_col != "headcount_supported":
+        mapped[hc_col] = "headcount_supported"
+
+    # spend_type → spend_type, capex_opex, type
+    st_col = find_col(["spend_type", "capex_opex", "financial_type"], "spend_type")
+    if st_col and st_col != "spend_type":
+        mapped[st_col] = "spend_type"
+
+    if mapped:
+        df = df.rename(columns=mapped)
+
+    return df
+
+
 def validate_and_clean(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """
     Clean and validate the uploaded DataFrame.
+    Handles arbitrary CSV formats by auto-detecting and mapping column names.
     Returns the cleaned DataFrame and a quality report dict.
     """
     quality_report = {
@@ -30,7 +117,10 @@ def validate_and_clean(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     df = df.copy()
 
     # Normalize column names: lowercase, strip whitespace, replace spaces with underscores
-    df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+    df.columns = [c.strip().lower().replace(" ", "_").replace("-", "_") for c in df.columns]
+
+    # Auto-map columns from arbitrary naming to expected schema
+    df = _auto_map_columns(df, quality_report)
 
     # Drop completely empty rows
     initial_len = len(df)
@@ -42,16 +132,44 @@ def validate_and_clean(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     # Coerce numeric columns
     for col in ["annual_cost", "monthly_cost", "utilization_pct", "headcount_supported"]:
         if col in df.columns:
-            df[col] = pd.to_numeric(df[col].astype(str).str.replace(r"[$,]", "", regex=True), errors="coerce")
+            df[col] = pd.to_numeric(df[col].astype(str).str.replace(r"[$,%,]", "", regex=True), errors="coerce")
 
     # If monthly_cost exists but annual_cost is missing, derive it
     if "monthly_cost" in df.columns and "annual_cost" in df.columns:
         mask = df["annual_cost"].isna() & df["monthly_cost"].notna()
         df.loc[mask, "annual_cost"] = df.loc[mask, "monthly_cost"] * 12
 
+    # If only monthly_cost exists, create annual_cost
+    if "monthly_cost" in df.columns and "annual_cost" not in df.columns:
+        df["annual_cost"] = df["monthly_cost"] * 12
+        quality_report["warnings"].append("Derived 'annual_cost' from monthly_cost * 12")
+
     # If only annual_cost exists, derive monthly
     if "annual_cost" in df.columns and "monthly_cost" not in df.columns:
         df["monthly_cost"] = df["annual_cost"] / 12
+
+    # Synthesize missing required columns with sensible defaults
+    if "vendor" not in df.columns and "service_name" in df.columns:
+        df["vendor"] = df["service_name"]
+        quality_report["warnings"].append("No vendor column found — using service_name as vendor")
+    elif "vendor" not in df.columns:
+        df["vendor"] = "Unknown Vendor"
+        quality_report["warnings"].append("No vendor column found — defaulting to 'Unknown Vendor'")
+
+    if "service_name" not in df.columns and "vendor" in df.columns:
+        df["service_name"] = df["vendor"]
+
+    if "department" not in df.columns:
+        df["department"] = "IT Operations"
+        quality_report["warnings"].append("No department column found — defaulting to 'IT Operations'")
+
+    if "cost_category" not in df.columns:
+        # Try to infer from spend_type if it exists
+        if "spend_type" in df.columns:
+            df["cost_category"] = df["spend_type"]
+        else:
+            df["cost_category"] = "Other"
+        quality_report["warnings"].append("No cost_category column found — defaulting to 'Other'")
 
     # Clamp utilization to 0-100
     if "utilization_pct" in df.columns:
