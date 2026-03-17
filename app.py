@@ -468,7 +468,12 @@ else:
                     mime="text/csv",
                 )
         else:
-            st.subheader("Identified Waste & Inefficiencies")
+            st.info("Click the button below to generate AI-powered optimization recommendations with ROI estimates.")
+            if st.button("Generate Optimization Recommendations", type="primary", use_container_width=True):
+                _run_agent("optimization", "Generate all cost optimization recommendations with ROI estimates")
+
+            st.markdown("---")
+            st.subheader("Identified Waste & Inefficiencies (Pre-Analysis)")
             col_l, col_r = st.columns(2)
             with col_l:
                 underutil = st.session_state.analytics.get("underutilized", pd.DataFrame())
@@ -481,9 +486,6 @@ else:
                 if not dups.empty:
                     st.metric("Duplicate Tool Instances", len(dups))
                     st.dataframe(dups, use_container_width=True)
-
-            if st.button("Generate Optimization Recommendations", type="primary"):
-                _run_agent("optimization", "Generate all cost optimization recommendations with ROI estimates")
 
     # ── TAB 5: Executive Report ───────────────────────────────────────────────
     with tab_report:
@@ -521,32 +523,14 @@ else:
                         use_container_width=True,
                     )
         else:
-            st.info("Generate a report to see the executive summary and export options.")
-            if st.button("Generate Executive Report", type="primary"):
+            st.info("Click the button below to generate a C-suite ready executive report with export options.")
+            if st.button("Generate Executive Report", type="primary", use_container_width=True):
                 _run_agent("report", "Generate a comprehensive executive IT spend analysis report")
 
     # ── TAB 6: AI Chat ────────────────────────────────────────────────────────
     with tab_chat:
         st.subheader("Ask the AI Analyst")
-        st.caption("Ask questions about your IT spend data. The system will route your question to the most relevant specialist agent.")
-
-        # Suggested questions
-        st.markdown("**Suggested questions:**")
-        suggestions = [
-            "What are the top cost drivers?",
-            "Which services are underutilized?",
-            "Map spend to TBM cost pools",
-            "What are the biggest optimization opportunities?",
-            "Which contracts are renewing soon?",
-            "Which departments have the highest spend?",
-        ]
-        cols = st.columns(3)
-        for i, suggestion in enumerate(suggestions):
-            if cols[i % 3].button(suggestion, key=f"sug_{i}", use_container_width=True):
-                st.session_state["pending_question"] = suggestion
-                st.rerun()
-
-        st.markdown("---")
+        st.caption("Ask questions about your IT spend data. The system routes your question to the most relevant specialist agent.")
 
         # Chat history
         for msg in st.session_state.chat_history:
@@ -569,11 +553,9 @@ else:
                     )
                     st.markdown(msg["content"])
 
-        # Handle suggestion button clicks
-        if "pending_question" in st.session_state and st.session_state["pending_question"]:
-            q = st.session_state.pop("pending_question")
-            _run_agent("auto", q)
-
-        # Chat input
+        # Chat input — must be last element in tab
         if prompt := st.chat_input("Ask a question about your IT spend..."):
+            # Show user message immediately
+            with st.chat_message("user"):
+                st.write(prompt)
             _run_agent("auto", prompt)
